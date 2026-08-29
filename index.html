@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>个人记账本</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="wrap topbar-inner">
+        <h1>个人记账本</h1>
+        <div class="topbar-side">
+          <p class="today" id="today"></p>
+          <div class="theme-picker" role="group" aria-label="主题颜色">
+            <span class="theme-label">主题</span>
+            <button type="button" class="theme-dot active" data-theme="white" title="纯白" aria-label="纯白主题"></button>
+            <button type="button" class="theme-dot" data-theme="dark" title="纯黑" aria-label="纯黑主题"></button>
+            <button type="button" class="theme-dot" data-theme="warm" title="暖棕" aria-label="暖棕主题"></button>
+            <button type="button" class="theme-dot" data-theme="matcha" title="抹茶" aria-label="抹茶主题"></button>
+            <button type="button" class="theme-dot" data-theme="ocean" title="海盐" aria-label="海盐主题"></button>
+            <button type="button" class="theme-dot" data-theme="lilac" title="雾紫" aria-label="雾紫主题"></button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="summary">
+        <div class="sum-card in">
+          <span>本月收入</span>
+          <strong id="sumIncome">¥0.00</strong>
+        </div>
+        <div class="sum-card out">
+          <span>本月支出</span>
+          <strong id="sumExpense">¥0.00</strong>
+        </div>
+        <div class="sum-card bal">
+          <span>本月结余</span>
+          <strong id="sumBalance">¥0.00</strong>
+        </div>
+      </section>
+
+      <nav class="tabs">
+        <button class="tab active" data-tab="add">记一笔</button>
+        <button class="tab" data-tab="list">明细</button>
+        <button class="tab" data-tab="stats">分类统计</button>
+        <button class="tab" data-tab="budget">管家</button>
+      </nav>
+
+      <section class="panel" id="panel-add">
+        <form id="entryForm" class="entry-form">
+          <div class="type-toggle">
+            <button type="button" class="type-btn expense active" data-type="expense">支出</button>
+            <button type="button" class="type-btn income" data-type="income">收入</button>
+          </div>
+
+          <label class="field">
+            <span>金额（元）</span>
+            <input type="number" id="amount" step="0.01" min="0.01" placeholder="0.00" required />
+          </label>
+
+          <label class="field">
+            <span>分类</span>
+            <select id="category"></select>
+          </label>
+
+          <label class="field hidden" id="customWrap">
+            <span>自定义分类</span>
+            <input type="text" id="customCategory" maxlength="10" placeholder="输入分类名称" />
+          </label>
+
+          <label class="field">
+            <span>日期</span>
+            <input type="date" id="date" required />
+          </label>
+
+          <div class="field hidden" id="moodWrap">
+            <span class="mood-label">今天心情（可选）<em id="moodCurrent"></em></span>
+            <div class="mood-row" id="moodRow"></div>
+          </div>
+
+          <label class="field">
+            <span>备注（可选）</span>
+            <input type="text" id="note" maxlength="50" placeholder="例如：午餐、工资到账" />
+          </label>
+
+          <button class="submit" type="submit">保存账目</button>
+        </form>
+      </section>
+
+      <section class="panel hidden" id="panel-list">
+        <div class="panel-toolbar">
+          <div class="month-nav">
+            <button type="button" class="month-prev" id="monthPrev" title="上个月" aria-label="上个月">‹</button>
+            <label class="filter">
+              月份
+              <select id="monthFilter"></select>
+            </label>
+            <button type="button" class="month-next" id="monthNext" title="下个月" aria-label="下个月">›</button>
+          </div>
+          <span class="hint" id="listHint"></span>
+        </div>
+
+        <div class="flip-scene" id="flipScene">
+          <div class="flip-card" id="flipCard">
+            <div class="flip-face flip-front">
+              <div class="cal-wrap">
+                <div class="cal-week">
+                  <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span>
+                </div>
+                <div class="cal-grid" id="calGrid"></div>
+              </div>
+              <div class="cal-legend">
+                <span><i class="lg lg-green"></i>收入偏多</span>
+                <span><i class="lg lg-red"></i>支出偏多</span>
+                <span><i class="lg lg-amber"></i>收支相当</span>
+                <span><i class="lg lg-none"></i>未记录</span>
+              </div>
+              <p class="empty hidden" id="listEmpty">本月还没有记录，去「记一笔」添加吧。</p>
+            </div>
+            <div class="flip-face flip-back">
+              <div class="day-detail hidden" id="dayDetail"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel hidden" id="panel-stats">
+        <div class="panel-toolbar">
+          <label class="filter">
+            月份
+            <select id="statsMonthFilter"></select>
+          </label>
+          <span class="hint" id="statsScope"></span>
+        </div>
+
+        <div class="stats-total">
+          <div class="stat-cell in">
+            <span>总收入</span>
+            <strong id="totalIncome">¥0.00</strong>
+          </div>
+          <div class="stat-cell out">
+            <span>总支出</span>
+            <strong id="totalExpense">¥0.00</strong>
+          </div>
+          <div class="stat-cell bal">
+            <span>结余</span>
+            <strong id="totalBalance">¥0.00</strong>
+          </div>
+        </div>
+
+        <h2>支出 · 分类占比</h2>
+        <div id="expenseBars" class="bars"></div>
+
+        <h2>收入 · 分类占比</h2>
+        <div id="incomeBars" class="bars"></div>
+      </section>
+
+      <section class="panel hidden" id="panel-budget">
+        <div class="budget-grid">
+          <div class="budget-card">
+            <h2>本月预算</h2>
+            <p class="budget-hint">设定本月消费限额，月末自动生成达标或超标总结</p>
+            <form id="budgetForm" class="budget-form">
+              <div class="budget-input-row">
+                <span class="prefix">¥</span>
+                <input type="number" id="budgetInput" step="0.01" min="0" placeholder="例如 3000" />
+              </div>
+              <button class="submit budget-submit" type="submit">保存</button>
+            </form>
+            <p class="budget-msg muted" id="budgetMsg"></p>
+          </div>
+
+          <div class="budget-card">
+            <h2>本月进度 <em id="budgetMonth"></em></h2>
+            <div class="progress-top">
+              <span>已支出 <strong class="spent" id="budgetSpent">¥0.00</strong></span>
+              <span>预算 <strong id="budgetLimit">未设置</strong></span>
+            </div>
+            <div class="budget-track"><i id="budgetBar"></i></div>
+            <p class="budget-remain" id="budgetRemain"></p>
+          </div>
+        </div>
+
+        <h2 class="budget-list-title">月度总结</h2>
+        <div class="table-wrap">
+          <table class="ledger budget-ledger">
+            <thead>
+              <tr>
+                <th>月份</th>
+                <th class="num">收入</th>
+                <th class="num">支出</th>
+                <th class="num">结余</th>
+                <th class="num">预算</th>
+                <th>结果</th>
+                <th class="num">差额</th>
+              </tr>
+            </thead>
+            <tbody id="budgetBody"></tbody>
+          </table>
+        </div>
+        <p class="empty hidden" id="budgetEmpty">还没有月度记录，去「记一笔」添加吧。</p>
+      </section>
+    </main>
+
+    <footer class="wrap footnote">数据只保存在这台电脑的浏览器里，不会上传到任何地方。</footer>
+
+    <div class="popup hidden" id="notePopup">
+      <div class="popup-card">
+        <button type="button" class="popup-close" title="关闭">×</button>
+        <p class="popup-text" id="notePopupText"></p>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
