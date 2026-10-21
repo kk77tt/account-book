@@ -153,7 +153,10 @@
           </div>
         </div>
 
-        <h2>支出 · 分类占比</h2>
+        <div class="stats-heading">
+          <h2>支出 · 分类占比</h2>
+          <span>点击分类查看明细</span>
+        </div>
         <div id="expenseBars" class="bars"></div>
 
         <h2>收入 · 分类占比</h2>
@@ -213,6 +216,16 @@
       <div class="popup-card">
         <button type="button" class="popup-close" title="关闭">×</button>
         <p class="popup-text" id="notePopupText"></p>
+      </div>
+    </div>
+
+    <div class="popup hidden" id="statsPopup" role="dialog" aria-modal="true" aria-labelledby="statsPopupTitle">
+      <div class="popup-card stats-popup-card">
+        <button type="button" class="popup-close stats-popup-close" title="关闭" aria-label="关闭支出明细">×</button>
+        <p class="stats-popup-eyebrow">支出明细</p>
+        <h3 id="statsPopupTitle"></h3>
+        <p class="stats-popup-meta" id="statsPopupMeta"></p>
+        <div class="stats-detail-list" id="statsDetailList"></div>
       </div>
     </div>
 

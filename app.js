@@ -589,14 +589,59 @@
     });
     list.forEach(function (item) {
       var pct = total > 0 ? Math.round((item.amount / total) * 100) : 0;
-      var row = document.createElement('div');
-      row.className = 'bar-row';
+      var row = document.createElement(type === 'expense' ? 'button' : 'div');
+      if (type === 'expense') {
+        row.type = 'button';
+        row.className = 'bar-row bar-detail-trigger';
+        row.dataset.category = item.category;
+        row.setAttribute('aria-label', '查看 ' + item.category + ' 支出明细');
+      } else {
+        row.className = 'bar-row';
+      }
       row.innerHTML =
-        '<div class="bar-head"><span class="bar-name">' + categoryWithIcon(item.category) + '</span>' +
-        '<span class="bar-val">' + formatMoney(item.amount) + ' <em>' + pct + '%</em></span></div>' +
-        '<div class="bar-track"><i style="width:' + pct + '%"></i></div>';
+        '<span class="bar-head"><span class="bar-name">' + categoryWithIcon(item.category) + '</span>' +
+        '<span class="bar-val">' + formatMoney(item.amount) + ' <em>' + pct + '%</em></span></span>' +
+        '<span class="bar-track"><i style="width:' + pct + '%"></i></span>';
       box.appendChild(row);
     });
+  }
+
+  function openExpenseDetails(category) {
+    var items = entries.filter(function (e) {
+      return e.type === 'expense' && e.category === category && (statsMonth === 'all' || monthKey(e.date) === statsMonth);
+    }).sort(function (a, b) {
+      return b.date.localeCompare(a.date) || b.id.localeCompare(a.id);
+    });
+    var total = items.reduce(function (sum, e) {
+      return sum + e.amount;
+    }, 0);
+
+    $('statsPopupTitle').textContent = category + ' ' + categoryIcon(category);
+    $('statsPopupMeta').textContent =
+      (statsMonth === 'all' ? '全部时间' : monthLabel(statsMonth)) + ' · ' + items.length + ' 笔 · 共 ' + formatMoney(total);
+
+    var list = $('statsDetailList');
+    list.innerHTML = '';
+    items.forEach(function (e) {
+      var row = document.createElement('div');
+      row.className = 'stats-detail-row';
+      row.innerHTML =
+        '<div class="stats-detail-main">' +
+        '<span class="stats-detail-date">' + dayLabel(e.date) + '</span>' +
+        '<span class="stats-detail-note">' + (e.note ? esc(e.note) : '<span class="muted">无备注</span>') + '</span>' +
+        '</div>' +
+        '<div class="stats-detail-side">' +
+        '<span class="stats-detail-mood">' + (e.mood ? esc(e.mood) : '') + '</span>' +
+        '<strong class="expense">' + signMoney(e.amount, e.type) + '</strong>' +
+        '</div>';
+      list.appendChild(row);
+    });
+    $('statsPopup').classList.remove('hidden');
+    $('statsPopup').querySelector('.stats-popup-close').focus();
+  }
+
+  function closeExpenseDetails() {
+    $('statsPopup').classList.add('hidden');
   }
 
   function renderStats() {
@@ -882,6 +927,12 @@
       renderStats();
     });
 
+    $('expenseBars').addEventListener('click', function (ev) {
+      var trigger = ev.target.closest('.bar-detail-trigger');
+      if (!trigger) return;
+      openExpenseDetails(trigger.dataset.category);
+    });
+
     document.querySelectorAll('.theme-dot').forEach(function (dot) {
       dot.addEventListener('click', function () {
         if (dot.dataset.theme === document.documentElement.getAttribute('data-theme')) return;
@@ -938,8 +989,15 @@
       if (ev.target === this || ev.target.closest('.popup-close')) closeNotePopup();
     });
 
+    $('statsPopup').addEventListener('click', function (ev) {
+      if (ev.target === this || ev.target.closest('.popup-close')) closeExpenseDetails();
+    });
+
     document.addEventListener('keydown', function (ev) {
-      if (ev.key === 'Escape') closeNotePopup();
+      if (ev.key === 'Escape') {
+        closeNotePopup();
+        closeExpenseDetails();
+      }
     });
   }
 
