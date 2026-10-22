@@ -4,6 +4,7 @@
   var STORAGE_KEY = 'myMoney.entries.v1';
   var BUDGET_KEY = 'myMoney.budgets.v1';
   var THEME_KEY = 'myMoney.theme.v1';
+  var UPDATE_NOTICE_KEY = 'myMoney.notice.expense-details.v1';
   var CUSTOM = '__custom';
   var THEMES = ['white', 'dark', 'warm', 'matcha', 'ocean', 'lilac'];
 
@@ -644,6 +645,21 @@
     $('statsPopup').classList.add('hidden');
   }
 
+  function showUpdateNotice() {
+    try {
+      if (localStorage.getItem(UPDATE_NOTICE_KEY)) return;
+      localStorage.setItem(UPDATE_NOTICE_KEY, 'seen');
+    } catch (err) {
+      // 存储不可用时仍展示本次更新，但无法跨刷新记住状态
+    }
+    $('updateNotice').classList.remove('hidden');
+    $('updateNotice').querySelector('.update-notice-card').focus();
+  }
+
+  function closeUpdateNotice() {
+    $('updateNotice').classList.add('hidden');
+  }
+
   function renderStats() {
     var months = monthOptions();
     if (statsMonth === null || (statsMonth !== 'all' && months.indexOf(statsMonth) === -1)) {
@@ -993,10 +1009,15 @@
       if (ev.target === this || ev.target.closest('.popup-close')) closeExpenseDetails();
     });
 
+    $('updateNotice').addEventListener('click', function (ev) {
+      if (ev.target === this || ev.target.closest('.update-notice-dismiss')) closeUpdateNotice();
+    });
+
     document.addEventListener('keydown', function (ev) {
       if (ev.key === 'Escape') {
         closeNotePopup();
         closeExpenseDetails();
+        closeUpdateNotice();
       }
     });
   }
@@ -1016,6 +1037,7 @@
     $('moodWrap').classList.remove('hidden');
     bindEvents();
     renderAll();
+    showUpdateNotice();
   }
 
   if (typeof document !== 'undefined') {

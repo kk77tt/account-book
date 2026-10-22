@@ -1082,6 +1082,83 @@ select:focus {
   white-space: nowrap;
 }
 
+.update-notice-card {
+  width: min(460px, 100%);
+  padding: 28px 26px 22px;
+  overflow: hidden;
+}
+
+.update-notice-card:focus {
+  outline: none;
+}
+
+.update-notice-card::before {
+  position: absolute;
+  top: -42px;
+  right: -36px;
+  width: 118px;
+  height: 118px;
+  border-radius: 50%;
+  background: var(--tint-red);
+  content: '';
+  opacity: 0.72;
+}
+
+.update-notice-eyebrow {
+  position: relative;
+  margin: 0 0 7px;
+  color: var(--red);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.update-notice-card h3 {
+  position: relative;
+  margin: 0 0 14px;
+  font-size: 1.3rem;
+}
+
+.update-notice-copy {
+  position: relative;
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+.update-notice-signature {
+  margin: 10px 0 20px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  text-align: right;
+}
+
+.update-notice-dismiss {
+  position: relative;
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid var(--solid);
+  border-radius: 99px;
+  background: var(--solid);
+  color: var(--solid-text);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.update-notice-dismiss:hover {
+  transform: translateY(-1px);
+  opacity: 0.88;
+}
+
+.update-notice-dismiss:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
+}
+
 @keyframes popupIn {
   from {
     opacity: 0;
